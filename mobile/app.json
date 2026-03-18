@@ -1,0 +1,30 @@
+{
+  "expo": {
+    "name": "Campus Eats",
+    "slug": "campus-fuel",
+    "platforms": ["ios", "android", "web"],
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "campuseats",
+    "userInterfaceStyle": "dark",
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.campuseats.app",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Used to find the nearest dining venue on campus."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0f0f1a"
+      },
+      "package": "com.campuseats.app",
+      "permissions": ["ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION"]
+    },
+    "plugins": ["expo-router", "expo-location"],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

@@ -1,0 +1,49 @@
+# ── Python ──────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.venv/
+venv/
+env/
+.env
+*.env
+pip-log.txt
+pip-delete-this-directory.txt
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+htmlcov/
+.coverage
+coverage.xml
+
+# Alembic
+backend/migrations/versions/*.pyc
+
+# ── React Native / Expo ──────────────────────────────────
+mobile/node_modules/
+mobile/.expo/
+mobile/.env
+mobile/dist/
+mobile/web-build/
+mobile/.metro-health-check*
+mobile/android/
+mobile/ios/
+mobile/*.jks
+mobile/*.p8
+mobile/*.p12
+mobile/*.key
+mobile/*.mobileprovision
+mobile/npm-debug.*
+mobile/yarn-error.log
+mobile/.yarn/
+
+# ── OS ───────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
