@@ -11,6 +11,7 @@ from app.auth.middleware import get_current_user
 from app.db.base import get_db
 from app.db.models import MenuItem, VenueStatus
 from app.config import settings
+from app.meals.nutrients import fetch_nutrients
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 
