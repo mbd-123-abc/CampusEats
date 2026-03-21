@@ -49,9 +49,10 @@ def upgrade() -> None:
         sa.Column('user_id', UUID(as_uuid=True), sa.ForeignKey('users.user_id', ondelete='CASCADE'), nullable=False),
         sa.Column('logged_at', sa.TIMESTAMP(timezone=True), nullable=False, server_default=sa.text('NOW()')),
         sa.Column('items', sa.ARRAY(sa.Text), nullable=False),
-        sa.Column('portion_size', sa.Numeric(3, 1), nullable=False, server_default='1.0'),
+        sa.Column('item_portions', JSONB, nullable=False, server_default='[]'),
+        sa.Column('portion_size', sa.Numeric(3, 1), nullable=True),
         sa.Column('portion_count', sa.Integer, nullable=True),
-        sa.Column('nutrients_json', JSONB, nullable=False, server_default="'[]'"),
+        sa.Column('nutrients_json', JSONB, nullable=False, server_default='[]'),
         sa.Column('inhibitors_detected', sa.ARRAY(sa.Text), nullable=False, server_default='{}'),
         sa.Column('enhancers_detected', sa.ARRAY(sa.Text), nullable=False, server_default='{}'),
         sa.Column('meal_mood', sa.String(10), nullable=True),
@@ -59,14 +60,7 @@ def upgrade() -> None:
         sa.Column('accuracy_score', sa.Numeric(3, 2), nullable=False, server_default='0.60'),
     )
 
-    # Deduplication index — prevents double-taps within 60-second window
-    op.execute("""
-        CREATE UNIQUE INDEX meal_log_dedup ON meal_logs (
-            user_id,
-            floor(extract(epoch from logged_at) / 60)::bigint,
-            md5(items::text)
-        )
-    """)
+    # Note: dedup index omitted — timestamp-based expressions are not immutable in Postgres
 
 
 def downgrade() -> None:
