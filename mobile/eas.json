@@ -9,7 +9,11 @@
       "distribution": "internal"
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://campuseats-rdb6.onrender.com",
+        "EXPO_PUBLIC_USDA_API_KEY": "YvIMrMfcHfv8sZXDfeEHx0dqjwJatjyLJt7FcpQv"
+      }
     },
     "production": {
       "autoIncrement": true
