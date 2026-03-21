@@ -333,4 +333,4 @@ Please open a GitHub issue with:
 - [Google Calendar API](https://developers.google.com/calendar) — schedule integration
 - [Expo](https://expo.dev/) — React Native toolchain
 - [Render](https://render.com/) — backend hosting
-- [Kiro] (https://kiro.dev/) - spec driven AI IDE 
+- [Kiro](https://kiro.dev/) - spec driven AI IDE 
