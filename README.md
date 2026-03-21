@@ -94,12 +94,12 @@ College students are busy. Between back-to-back lectures, study sessions, and ev
 
 ### Demo
 
-[Android Deployment](https://expo.dev/accounts/mbd_123_abc/projects/campus-fuel/builds/0601fc13-3c15-46b6-a15e-a5ec14aa934a)
-[Youtube Demo](https://youtu.be/v-UeyXuKfDI)
+* [Android Deployment](https://expo.dev/accounts/mbd_123_abc/projects/campus-fuel/builds/0601fc13-3c15-46b6-a15e-a5ec14aa934a)
+* [Youtube Demo](https://youtu.be/v-UeyXuKfDI)
 
 ### Feedback Form
 
-[UI/UX] Feedback Form](https://forms.gle/q3XGMWAPSceWJqf8A)
+* [UI/UX Feedback Form](https://forms.gle/q3XGMWAPSceWJqf8A)
 
 ---
 
