@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  SafeAreaView, ScrollView, View, Text,
+  ScrollView, View, Text,
   TouchableOpacity, StyleSheet, ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { api } from '../api/client';
 

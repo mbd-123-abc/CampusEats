@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, ScrollView, Text, TouchableOpacity, StyleSheet, SafeAreaView, Linking, Platform, ActivityIndicator } from 'react-native';
+import { View, ScrollView, Text, TouchableOpacity, StyleSheet, Linking, Platform, ActivityIndicator, StatusBar } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect, useLocalSearchParams } from 'expo-router';
 
 import { HeroCard } from '../components/HeroCard';
@@ -242,7 +243,14 @@ export default function DashboardScreen() {
         {calendar.status === 'loading' ? (
           <ActivityIndicator color="#9381ff" style={{ marginTop: 24 }} />
         ) : calendar.status === 'connected' ? (
-          <DayTimeline blocks={calendar.timelineBlocks} onGapPress={() => {}} />
+          calendar.timelineBlocks.length > 0 ? (
+            <DayTimeline blocks={calendar.timelineBlocks} onGapPress={() => {}} />
+          ) : (
+            <View style={styles.emptyCalendar}>
+              <Text style={styles.emptyCalendarText}>No events today</Text>
+              <Text style={styles.emptyCalendarSub}>Add events to Google Calendar to see your schedule here</Text>
+            </View>
+          )
         ) : (
           <TouchableOpacity
             style={styles.calendarCard}
@@ -294,4 +302,7 @@ const styles = StyleSheet.create({
   calendarText:  { flex: 1 },
   calendarTitle: { color: '#e74c3c', fontSize: 16, fontWeight: '600', marginBottom: 3 },
   calendarSub:   { color: '#7a3030', fontSize: 13 },
+  emptyCalendar: { alignItems: 'center', paddingVertical: 32, paddingHorizontal: 24 },
+  emptyCalendarText: { color: '#c7c7e2', fontSize: 15, fontWeight: '600', marginBottom: 6 },
+  emptyCalendarSub:  { color: '#6b6b8a', fontSize: 13, textAlign: 'center' },
 });

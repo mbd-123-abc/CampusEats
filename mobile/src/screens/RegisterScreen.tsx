@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
-  SafeAreaView, ActivityIndicator,
+  KeyboardAvoidingView, Platform, ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { api } from '../api/client';
 import { useAuthStore } from '../store/authStore';
@@ -72,6 +73,7 @@ export default function RegisterScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'android' ? 'height' : 'padding'} style={{ flex: 1, justifyContent: 'center' }}>
       <Text style={styles.title}>Create Account</Text>
 
       <TextInput
@@ -119,12 +121,13 @@ export default function RegisterScreen() {
       <TouchableOpacity onPress={() => router.push('/login')} accessibilityRole="button">
         <Text style={styles.link}>Already have an account? Log in</Text>
       </TouchableOpacity>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0f0f1a', padding: 24, justifyContent: 'center' },
+  container: { flex: 1, backgroundColor: '#0f0f1a', padding: 24 },
   title:     { color: '#fff', fontSize: 28, fontWeight: '700', marginBottom: 32 },
   input: {
     backgroundColor: '#1a1a2e', color: '#fff', borderRadius: 10,
