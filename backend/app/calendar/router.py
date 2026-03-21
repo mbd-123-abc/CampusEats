@@ -311,10 +311,9 @@ async def calendar_callback(
         if redis:
             await redis.setex(f"cal_token:{user_id}", 60 * 60 * 24 * 30, refresh_token)
 
-    # 7. Return an HTML page that deep-links back into Expo and auto-closes
+    # 7. Return an HTML page that deep-links back into the app
     from fastapi.responses import HTMLResponse
     deep_link = "campuseats://dashboard?calendar=connected"
-    exp_link  = f"exp://10.0.0.102:8081/--/dashboard?calendar=connected"
     html = f"""<!DOCTYPE html>
 <html>
 <head>
@@ -332,11 +331,7 @@ async def calendar_callback(
   </style>
   <script>
     window.onload = function() {{
-      // Try custom scheme first (standalone build), then Expo Go URL
       window.location.href = "{deep_link}";
-      setTimeout(function() {{
-        window.location.href = "{exp_link}";
-      }}, 1000);
     }};
   </script>
 </head>
