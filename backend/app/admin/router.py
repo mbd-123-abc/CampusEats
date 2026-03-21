@@ -1,3 +1,4 @@
+import asyncio
 from fastapi import APIRouter, HTTPException, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.dialects.postgresql import insert as pg_insert
@@ -94,6 +95,20 @@ async def add_menu_item(
     db.add(item)
     await db.commit()
     await db.refresh(item)
+
+    # Fire-and-forget nutrient fetch — doesn't block the response
+    async def _backfill(item_id, name):
+        nutrients = await fetch_nutrients(name)
+        if nutrients:
+            async for session in get_db():
+                from sqlalchemy import update as sa_update
+                from app.db.models import MenuItem as MI
+                await session.execute(
+                    sa_update(MI).where(MI.item_id == item_id).values(nutrients_json=nutrients)
+                )
+                await session.commit()
+
+    asyncio.create_task(_backfill(item.item_id, item.name))
     return {"item_id": str(item.item_id), "name": item.name}
 
 
