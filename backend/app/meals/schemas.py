@@ -3,7 +3,7 @@ from typing import Literal, Optional
 import hashlib
 
 PortionSize = Literal[0.5, 1.0, 1.5]
-MealMood = Literal["low", "neutral", "high"]
+MealMood = Literal["energized", "satisfied", "food_coma", "bloated", "still_hungry"]
 LogSource = Literal["auto_contextual", "manual_search", "usual_shortcut", "photo"]
 
 
@@ -31,6 +31,7 @@ class NutrientLogEntrySchema(BaseModel):
 
 class LogMealRequest(BaseModel):
     items: list[str]
+    item_portions: list[float] = []          # per-item multipliers (0.5/1.0/1.5), parallel to items[]
     portion_size: Optional[PortionSize] = None
     portion_count: Optional[int] = None
     nutrients: list[NutrientLogEntrySchema] = []
@@ -46,10 +47,15 @@ class LogMealRequest(BaseModel):
 
     @model_validator(mode="after")
     def validate_portion_xor(self) -> "LogMealRequest":
+        # If per-item portions are provided, no global portion needed
+        if self.item_portions:
+            return self
+        # Otherwise exactly one of portion_size or portion_count must be set
         has_size = self.portion_size is not None
         has_count = self.portion_count is not None
-        if has_size == has_count:  # both set or neither set
-            raise ValueError("Exactly one of portion_size or portion_count must be set")
+        if not has_size and not has_count:
+            # Default to portion_size=1.0 rather than erroring
+            self.portion_size = 1.0
         return self
 
     def items_md5(self) -> str:
@@ -60,6 +66,7 @@ class MealLogResponse(BaseModel):
     log_id: str
     user_id: str
     items: list[str]
+    item_portions: list[float]
     portion_size: Optional[float]
     portion_count: Optional[int]
     nutrients: list[NutrientLogEntrySchema]

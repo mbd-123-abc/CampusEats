@@ -25,7 +25,7 @@ import urllib.parse
 from datetime import datetime, timezone, timedelta
 
 import httpx
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete
@@ -34,8 +34,11 @@ from app.auth.middleware import get_current_user
 from app.db.base import get_db
 from app.db.models import CalendarEvent
 from app.config import settings
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 router = APIRouter(prefix="/calendar", tags=["calendar"])
+limiter = Limiter(key_func=get_remote_address)
 
 GOOGLE_AUTH_URL     = "https://accounts.google.com/o/oauth2/v2/auth"
 GOOGLE_TOKEN_URL    = "https://oauth2.googleapis.com/token"
@@ -155,20 +158,34 @@ def _sanitise_events(raw_events: list) -> list[dict]:
 # ---------------------------------------------------------------------------
 
 @router.get("/status")
-async def calendar_status(current_user: dict = Depends(get_current_user)):
+@limiter.limit("60/minute")
+async def calendar_status(
+    request: Request,
+    current_user: dict = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
     """
-    Returns whether Google Calendar is configured and whether this user
-    has already connected. Requires auth — no leaking config to anon callers.
+    Returns whether this user has calendar events stored.
+    Checks Redis for a live token first; falls back to checking the DB
+    for any stored events (covers local dev without Redis).
     """
-    if not settings.google_client_id:
-        return {"configured": False, "connected": False}
+    user_id = current_user["sub"]
 
+    # Primary: Redis token present
     redis = await _get_redis_safe()
-    connected = bool(redis and await redis.exists(f"cal_token:{current_user['sub']}"))
+    if redis and await redis.exists(f"cal_token:{user_id}"):
+        return {"configured": True, "connected": True}
+
+    # Fallback: any events in the DB means they connected at some point
+    result = await db.execute(
+        select(CalendarEvent).where(CalendarEvent.user_id == user_id).limit(1)
+    )
+    connected = result.scalar_one_or_none() is not None
     return {"configured": True, "connected": connected}
 
 @router.get("/connect-init")
-async def calendar_connect_init(token: str = Query(...)):
+@limiter.limit("10/minute")
+async def calendar_connect_init(request: Request, token: str = Query(...)):
     """
     Browser-facing entry point (opened via Linking.openURL).
     Accepts the JWT as a query param, validates it server-side immediately,
@@ -276,14 +293,17 @@ async def calendar_callback(
                 "maxResults":   500,
             },
         )
-    if ev_resp.status_code != 200:
-        raise HTTPException(status_code=502, detail="Failed to fetch calendar events")
-
-    # 5. Persist events (replace existing)
-    await db.execute(delete(CalendarEvent).where(CalendarEvent.user_id == user_id))
-    for ev in _sanitise_events(ev_resp.json().get("items", [])):
-        db.add(CalendarEvent(user_id=user_id, **ev))
-    await db.commit()
+    # 5. Persist events (replace existing) — skip gracefully if calendar API not enabled
+    if ev_resp.status_code == 200:
+        await db.execute(delete(CalendarEvent).where(CalendarEvent.user_id == user_id))
+        for ev in _sanitise_events(ev_resp.json().get("items", [])):
+            db.add(CalendarEvent(user_id=user_id, **ev))
+        await db.commit()
+    else:
+        import logging
+        logging.getLogger(__name__).error(
+            "Calendar events fetch failed %s: %s", ev_resp.status_code, ev_resp.text[:500]
+        )
 
     # 6. Store refresh token (30-day TTL) for silent re-sync
     if refresh_token:
@@ -291,12 +311,48 @@ async def calendar_callback(
         if redis:
             await redis.setex(f"cal_token:{user_id}", 60 * 60 * 24 * 30, refresh_token)
 
-    # 7. Fixed redirect — no user-controlled target
-    return RedirectResponse(f"{settings.frontend_url}/dashboard?calendar=connected")
+    # 7. Return an HTML page that deep-links back into Expo and auto-closes
+    from fastapi.responses import HTMLResponse
+    deep_link = "campuseats://dashboard?calendar=connected"
+    exp_link  = f"exp://10.0.0.102:8081/--/dashboard?calendar=connected"
+    html = f"""<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Calendar Connected</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <style>
+    body {{ font-family: -apple-system, sans-serif; background: #0f0f1a; color: #fff;
+           display: flex; flex-direction: column; align-items: center;
+           justify-content: center; height: 100vh; margin: 0; text-align: center; padding: 24px; }}
+    h2 {{ color: #74c69d; margin-bottom: 8px; }}
+    p  {{ color: #888; font-size: 14px; margin-bottom: 24px; }}
+    a  {{ background: #4361ee; color: #fff; padding: 14px 28px; border-radius: 10px;
+          text-decoration: none; font-size: 16px; font-weight: 600; }}
+  </style>
+  <script>
+    window.onload = function() {{
+      // Try custom scheme first (standalone build), then Expo Go URL
+      window.location.href = "{deep_link}";
+      setTimeout(function() {{
+        window.location.href = "{exp_link}";
+      }}, 1000);
+    }};
+  </script>
+</head>
+<body>
+  <h2>Calendar Connected</h2>
+  <p>Redirecting you back to Campus Eats...</p>
+  <a href="{deep_link}">Open App</a>
+</body>
+</html>"""
+    return HTMLResponse(content=html)
 
 
 @router.post("/sync")
+@limiter.limit("10/minute")
 async def sync_calendar(
+    request: Request,
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
@@ -357,21 +413,49 @@ async def sync_calendar(
 
 
 @router.get("/events")
+@limiter.limit("60/minute")
 async def get_calendar_events(
+    request: Request,
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Return today's calendar events for the authenticated user."""
+    """Return today's calendar events for the authenticated user (local date based on UTC offset)."""
     user_id     = current_user["sub"]
     now         = datetime.now(timezone.utc)
-    today_start = now.replace(hour=0,  minute=0,  second=0,  microsecond=0).isoformat()
-    today_end   = now.replace(hour=23, minute=59, second=59, microsecond=0).isoformat()
+    # Use a broad window (yesterday to tomorrow) to avoid timezone edge cases
+    today_start = (now - timedelta(hours=12)).isoformat()
+    today_end   = (now + timedelta(hours=36)).isoformat()
 
     result = await db.execute(
         select(CalendarEvent)
         .where(CalendarEvent.user_id == user_id)
         .where(CalendarEvent.start_dt >= today_start)
         .where(CalendarEvent.start_dt <= today_end)
+        .order_by(CalendarEvent.start_dt)
+    )
+    return {
+        "events": [
+            {"id": str(e.event_id), "title": e.title, "start": e.start_dt, "end": e.end_dt}
+            for e in result.scalars().all()
+        ]
+    }
+
+
+@router.get("/events/week")
+async def get_calendar_events_week(
+    current_user: dict = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Return all stored events for the next 7 days."""
+    user_id = current_user["sub"]
+    now     = datetime.now(timezone.utc)
+    week_end = (now + timedelta(days=7)).isoformat()
+
+    result = await db.execute(
+        select(CalendarEvent)
+        .where(CalendarEvent.user_id == user_id)
+        .where(CalendarEvent.start_dt >= now.isoformat())
+        .where(CalendarEvent.start_dt <= week_end)
         .order_by(CalendarEvent.start_dt)
     )
     return {
@@ -402,3 +486,25 @@ async def disconnect_calendar(
     await db.execute(delete(CalendarEvent).where(CalendarEvent.user_id == user_id))
     await db.commit()
     return {"disconnected": True}
+
+
+@router.get("/debug")
+async def calendar_debug(
+    current_user: dict = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Dev-only: shows total stored events and the first 5, so you can confirm the DB has data."""
+    user_id = current_user["sub"]
+    result = await db.execute(
+        select(CalendarEvent)
+        .where(CalendarEvent.user_id == user_id)
+        .order_by(CalendarEvent.start_dt)
+    )
+    events = result.scalars().all()
+    return {
+        "total_stored": len(events),
+        "sample": [
+            {"title": e.title, "start": e.start_dt, "end": e.end_dt}
+            for e in events[:5]
+        ],
+    }

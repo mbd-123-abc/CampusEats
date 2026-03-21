@@ -121,12 +121,13 @@ class MealLog(Base):
     user_id = uuid_col(foreign_key="users.user_id")
     logged_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.now())
     items = Column(ArrayText, nullable=False)
-    portion_size = Column(Numeric(3, 1), nullable=False, default=1.0)
+    item_portions = Column(FlexJSON, nullable=False, default=list)   # per-item multipliers
+    portion_size = Column(Numeric(3, 1), nullable=True, default=None)
     portion_count = Column(Integer, nullable=True)
     nutrients_json = Column(FlexJSON, nullable=False, default=list)
     inhibitors_detected = Column(ArrayText, nullable=False, default=list)
     enhancers_detected = Column(ArrayText, nullable=False, default=list)
-    meal_mood = Column(String(10), nullable=True)
+    meal_mood = Column(String(20), nullable=True)
     source = Column(String(20), nullable=False, default="manual_search")
     accuracy_score = Column(Numeric(3, 2), nullable=False, default=0.60)
 

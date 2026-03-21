@@ -15,15 +15,19 @@ export interface AuthState {
   token: string | null;
   username: string | null;
   hydrated: boolean;
+  error: string | null;
   setToken: (token: AuthToken) => Promise<void>;
   clearToken: () => Promise<void>;
   loadToken: () => Promise<void>;
+  clearError: () => void;
+  setError: (msg: string) => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
   token: null,
   username: null,
   hydrated: false,
+  error: null,
 
   setToken: async (auth: AuthToken) => {
     await AsyncStorage.setItem('access_token', auth.access_token);
@@ -39,4 +43,8 @@ export const useAuthStore = create<AuthState>((set) => ({
     const token = await AsyncStorage.getItem('access_token');
     set({ token, username: token ? parseUsername(token) : null, hydrated: true });
   },
+
+  clearError: () => set({ error: null }),
+
+  setError: (msg: string) => set({ error: msg }),
 }));

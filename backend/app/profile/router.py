@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
@@ -9,13 +9,18 @@ from app.db.models import UserPreferences
 from app.auth.middleware import get_current_user
 from app.profile.schemas import SavePreferencesRequest
 from app.config import settings
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 import uuid
 
 router = APIRouter(prefix="/profile", tags=["profile"])
+limiter = Limiter(key_func=get_remote_address)
 
 
 @router.get("/preferences", status_code=200)
+@limiter.limit("60/minute")
 async def get_preferences(
+    request: Request,
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
@@ -37,7 +42,9 @@ async def get_preferences(
 
 
 @router.put("/preferences", status_code=200)
+@limiter.limit("30/minute")
 async def save_preferences(
+    request: Request,
     req: SavePreferencesRequest,
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),

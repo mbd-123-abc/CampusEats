@@ -79,7 +79,7 @@ async def login(req: LoginRequest, db: AsyncSession) -> AuthToken:
         raise HTTPException(status_code=401, detail="Invalid username or password")
 
     # Check lockout
-    if user.locked_until and user.locked_until > datetime.now(tz=timezone.utc):
+    if user.locked_until and user.locked_until.replace(tzinfo=timezone.utc) > datetime.now(tz=timezone.utc):
         raise HTTPException(status_code=401, detail="Account temporarily locked — try again later")
 
     # Reset failed attempts on success

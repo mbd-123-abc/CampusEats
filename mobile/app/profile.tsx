@@ -59,38 +59,45 @@ export default function ProfileScreen() {
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const loadedRef = useRef(false);
 
+  // Refs to always hold latest values for the debounced save
+  const hardFiltersRef = useRef<string[]>([]);
+  const prefFiltersRef = useRef<string[]>([]);
+  const trackedNutrientsRef = useRef<string[]>(['iron', 'protein']);
+  const studyIntensityRef = useRef<'chill' | 'midterm' | 'finals'>('chill');
+  const walkingSpeedRef = useRef<'slow' | 'average' | 'power'>('average');
+  const mealPlanRef = useRef<'unlimited' | '14_per_week' | 'commuter_cash'>('unlimited');
+
   // Load saved preferences on mount
   useEffect(() => {
     api.get('/profile/preferences').then(({ data }) => {
-      if (data.hard_filters?.length)       setHardFilters(data.hard_filters);
-      if (data.preference_filters?.length) setPrefFilters(data.preference_filters);
-      if (data.nutrient_focus?.length)     setTrackedNutrients(data.nutrient_focus);
-      if (data.academic_intensity)         setStudyIntensity(data.academic_intensity);
-      if (data.walking_speed)              setWalkingSpeed(data.walking_speed);
-      if (data.meal_plan_type)             setMealPlan(data.meal_plan_type);
+      if (data.hard_filters?.length)       { setHardFilters(data.hard_filters); hardFiltersRef.current = data.hard_filters; }
+      if (data.preference_filters?.length) { setPrefFilters(data.preference_filters); prefFiltersRef.current = data.preference_filters; }
+      if (data.nutrient_focus?.length)     { setTrackedNutrients(data.nutrient_focus); trackedNutrientsRef.current = data.nutrient_focus; }
+      if (data.academic_intensity)         { setStudyIntensity(data.academic_intensity); studyIntensityRef.current = data.academic_intensity; }
+      if (data.walking_speed)              { setWalkingSpeed(data.walking_speed); walkingSpeedRef.current = data.walking_speed; }
+      if (data.meal_plan_type)             { setMealPlan(data.meal_plan_type); mealPlanRef.current = data.meal_plan_type; }
       loadedRef.current = true;
     }).catch(() => { loadedRef.current = true; });
   }, []);
 
-  // Auto-save with debounce whenever any preference changes
-  const autoSave = (overrides: object = {}) => {
-    if (!loadedRef.current) return; // don't save during initial load
+  // Auto-save with debounce — reads from refs so always uses latest values
+  const autoSave = () => {
+    if (!loadedRef.current) return;
     if (debounceRef.current) clearTimeout(debounceRef.current);
     setSaveStatus('saving');
     debounceRef.current = setTimeout(() => {
       api.put('/profile/preferences', {
-        hard_filters: hardFilters,
-        preference_filters: prefFilters,
-        nutrient_focus: trackedNutrients,
+        hard_filters: hardFiltersRef.current,
+        preference_filters: prefFiltersRef.current,
+        nutrient_focus: trackedNutrientsRef.current,
         likes: [],
         dislikes: [],
         pantry_items: [],
-        academic_intensity: studyIntensity,
-        walking_speed: walkingSpeed,
-        meal_plan_type: mealPlan,
+        academic_intensity: studyIntensityRef.current,
+        walking_speed: walkingSpeedRef.current,
+        meal_plan_type: mealPlanRef.current,
         dislike_strictness: 'low',
         show_calories: false,
-        ...overrides,
       }).then(() => setSaveStatus('saved'))
         .catch(() => setSaveStatus('idle'));
     }, 600);
@@ -122,8 +129,9 @@ export default function ProfileScreen() {
           {HARD_FILTER_OPTIONS.map((f) => (
             <Chip key={f} label={f} selected={hardFilters.includes(f)} onPress={() => {
               const next = toggle(hardFilters, f);
+              hardFiltersRef.current = next;
               setHardFilters(next);
-              autoSave({ hard_filters: next });
+              autoSave();
             }} />
           ))}
         </View>
@@ -134,8 +142,9 @@ export default function ProfileScreen() {
           {PREF_FILTER_OPTIONS.map((f) => (
             <Chip key={f} label={f} selected={prefFilters.includes(f)} onPress={() => {
               const next = toggle(prefFilters, f);
+              prefFiltersRef.current = next;
               setPrefFilters(next);
-              autoSave({ preference_filters: next });
+              autoSave();
             }} />
           ))}
         </View>
@@ -145,8 +154,9 @@ export default function ProfileScreen() {
           {NUTRIENT_OPTIONS.map((n) => (
             <Chip key={n} label={n.replace('_', ' ')} selected={trackedNutrients.includes(n)} onPress={() => {
               const next = toggle(trackedNutrients, n);
+              trackedNutrientsRef.current = next;
               setTrackedNutrients(next);
-              autoSave({ nutrient_focus: next });
+              autoSave();
             }} />
           ))}
         </View>
@@ -155,8 +165,9 @@ export default function ProfileScreen() {
         <View style={styles.chipRow}>
           {INTENSITY_OPTIONS.map((i) => (
             <Chip key={i} label={i} selected={studyIntensity === i} onPress={() => {
+              studyIntensityRef.current = i;
               setStudyIntensity(i);
-              autoSave({ academic_intensity: i });
+              autoSave();
             }} />
           ))}
         </View>
@@ -165,8 +176,9 @@ export default function ProfileScreen() {
         <View style={styles.chipRow}>
           {SPEED_OPTIONS.map((s) => (
             <Chip key={s} label={s} selected={walkingSpeed === s} onPress={() => {
+              walkingSpeedRef.current = s;
               setWalkingSpeed(s);
-              autoSave({ walking_speed: s });
+              autoSave();
             }} />
           ))}
         </View>
@@ -175,8 +187,9 @@ export default function ProfileScreen() {
         <View style={styles.chipRow}>
           {MEAL_PLAN_OPTIONS.map((m) => (
             <Chip key={m} label={m.replace(/_/g, ' ')} selected={mealPlan === m} onPress={() => {
+              mealPlanRef.current = m;
               setMealPlan(m);
-              autoSave({ meal_plan_type: m });
+              autoSave();
             }} />
           ))}
         </View>

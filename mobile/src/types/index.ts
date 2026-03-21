@@ -1,22 +1,25 @@
 export type WindowType = 'golden' | 'micro';
+export type GapCategory = 'sprint' | 'micro' | 'standard' | 'deep';
 export type DashboardState = 'normal' | 'in_class' | 'end_of_day';
-export type MealMood = 'low' | 'neutral' | 'high';
+export type MealMood = 'energized' | 'satisfied' | 'food_coma' | 'bloated' | 'still_hungry';
 export type LogSource = 'auto_contextual' | 'manual_search' | 'usual_shortcut' | 'photo';
 export type PortionSize = 0.5 | 1.0 | 1.5;
 
 export interface EatingWindow {
-  start: string;          // ISO 8601 UTC
-  end: string;            // ISO 8601 UTC
+  start: string;
+  end: string;
   duration_minutes: number;
   window_type: WindowType;
+  gap_category: GapCategory;
 }
 
 export interface MealRecommendation {
   mealName: string;
   venueName: string;
   walkMinutes: number;
-  nutrientMatchScores: Record<string, number>;  // all values in [0.0, 1.0]
-  overallScore: number;                          // [0.0, 1.0]
+  actionTimeMinutes: number;   // walkMinutes * 2 + eatMinutes
+  nutrientMatchScores: Record<string, number>;
+  overallScore: number;
 }
 
 export interface HeroCardProps {
@@ -26,15 +29,20 @@ export interface HeroCardProps {
   dashboardState: DashboardState;
   onGetDirections: () => void;
   onSeeMenu: () => void;
+  detourLabel?: 'on-your-way' | 'short-detour' | 'detour';
+  nextMealLabel?: string;   // e.g. 'Breakfast', 'Lunch', 'Dinner', 'Snack'
+  nextMealTime?: string;    // ISO string of the next window start
 }
 
 export interface TimelineBlock {
-  startTime: string;      // ISO 8601 UTC — NOT bare "HH:MM"
-  endTime: string;        // ISO 8601 UTC
+  startTime: string;
+  endTime: string;
   type: 'class' | 'meal_gap';
   label: string;
-  nutrientMatchLabel?: string;   // only for meal_gap
-  venueHint?: string;            // only for meal_gap
+  gap_category?: GapCategory;
+  actionTimeMinutes?: number;  // time-to-action badge value
+  nutrientMatchLabel?: string;
+  venueHint?: string;
 }
 
 export interface TrackedNutrient {

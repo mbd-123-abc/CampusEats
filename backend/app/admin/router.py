@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
@@ -11,8 +11,11 @@ from app.auth.middleware import get_current_user
 from app.db.base import get_db
 from app.db.models import MenuItem, VenueStatus
 from app.config import settings
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 router = APIRouter(prefix="/admin", tags=["admin"])
+limiter = Limiter(key_func=get_remote_address)
 
 
 def require_admin(current_user: dict = Depends(get_current_user)) -> dict:
@@ -35,7 +38,9 @@ class VenueToggle(BaseModel):
 
 
 @router.post("/menu/items", status_code=201)
+@limiter.limit("30/minute")
 async def add_menu_item(
+    request: Request,
     body: MenuItemIn,
     db: AsyncSession = Depends(get_db),
     _: dict = Depends(require_admin),
@@ -60,7 +65,9 @@ async def add_menu_item(
 
 
 @router.patch("/venues/{venue_name}")
+@limiter.limit("30/minute")
 async def toggle_venue(
+    request: Request,
     venue_name: str,
     body: VenueToggle,
     db: AsyncSession = Depends(get_db),
@@ -91,7 +98,8 @@ async def admin_ping(admin: dict = Depends(require_admin)):
 # ── Public menu endpoints (no auth) ───────────────────────────────────────
 
 @router.get("/menu/{venue_name}")
-async def get_venue_menu(venue_name: str, db: AsyncSession = Depends(get_db)):
+@limiter.limit("60/minute")
+async def get_venue_menu(request: Request, venue_name: str, db: AsyncSession = Depends(get_db)):
     today = date_type.today().isoformat()
 
     result = await db.execute(

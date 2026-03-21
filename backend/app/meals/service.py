@@ -64,8 +64,9 @@ async def log_meal(user_id: str, req: LogMealRequest, db: AsyncSession) -> MealL
         overall_accuracy = ACCURACY_GENERIC
 
     log = MealLog(
-        user_id=uuid.UUID(user_id),
+        user_id=user_id,  # already a str from router: str(current_user["sub"])
         items=req.items,
+        item_portions=req.item_portions or ([req.portion_size] * len(req.items) if req.portion_size else [1.0] * len(req.items)),
         portion_size=req.portion_size,
         portion_count=req.portion_count,
         nutrients_json=nutrients_list,
@@ -84,7 +85,7 @@ async def log_meal(user_id: str, req: LogMealRequest, db: AsyncSession) -> MealL
         # Deduplication: return existing entry
         result = await db.execute(
             select(MealLog)
-            .where(MealLog.user_id == uuid.UUID(user_id))
+            .where(MealLog.user_id == user_id)
             .order_by(MealLog.logged_at.desc())
             .limit(1)
         )
@@ -111,6 +112,7 @@ def _to_response(log: MealLog) -> MealLogResponse:
         log_id=str(log.log_id),
         user_id=str(log.user_id),
         items=log.items,
+        item_portions=log.item_portions or [1.0] * len(log.items),
         portion_size=float(log.portion_size) if log.portion_size else None,
         portion_count=log.portion_count,
         nutrients=nutrients,

@@ -43,6 +43,8 @@ class SavePreferencesRequest(BaseModel):
     @field_validator("nutrient_focus")
     @classmethod
     def validate_nutrient_focus(cls, v: list[str]) -> list[str]:
+        if not v:
+            return v
         if len(v) > 3:
             raise ValueError("You can track up to 3 nutrients at a time")
         invalid = set(v) - NUTRIENT_FOCUS_OPTIONS

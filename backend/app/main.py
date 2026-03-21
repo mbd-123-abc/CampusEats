@@ -23,12 +23,19 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:8081",
         "http://127.0.0.1:8081",
+        "http://localhost:8082",
+        "http://127.0.0.1:8082",
+        "http://localhost:8083",
+        "http://127.0.0.1:8083",
         "http://localhost:19006",
         "http://127.0.0.1:19006",
+        "http://10.0.0.102:8081",
+        "http://10.0.0.102:8082",
+        "http://10.0.0.102:19000",
+        "exp://10.0.0.102:8081",
+        "exp://10.0.0.102:8082",
         "exp://localhost:8081",
         "https://campus-eats-api.onrender.com",
-        # Expo Go on device uses exp:// — allow all origins in dev
-        # In production, replace * with your actual app domain
     ],
     allow_origin_regex=r"https://.*\.onrender\.com",
     allow_credentials=True,

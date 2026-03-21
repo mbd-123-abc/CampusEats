@@ -19,16 +19,19 @@ async def seed():
     async with async_session() as session:
         result = await session.execute(select(User).where(User.username == "admin"))
         existing = result.scalar_one_or_none()
-        if existing:
-            print("Admin user already exists.")
-            return
 
         password = input("Set admin password: ")
         password_hash = bcrypt.hashpw(password.encode(), bcrypt.gensalt(12)).decode()
-        admin = User(username="admin", password_hash=password_hash, university="uw_seattle")
-        session.add(admin)
-        await session.commit()
-        print("Admin user created.")
+
+        if existing:
+            existing.password_hash = password_hash
+            await session.commit()
+            print("Admin password updated.")
+        else:
+            admin = User(username="admin", password_hash=password_hash, university="uw_seattle")
+            session.add(admin)
+            await session.commit()
+            print("Admin user created.")
 
     await engine.dispose()
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, ScrollView, Text, TouchableOpacity, StyleSheet, SafeAreaView, Linking, Platform } from 'react-native';
+import { View, ScrollView, Text, TouchableOpacity, StyleSheet, SafeAreaView, Linking, Platform, ActivityIndicator } from 'react-native';
 import { useRouter, useFocusEffect, useLocalSearchParams } from 'expo-router';
 
 import { HeroCard } from '../components/HeroCard';
@@ -8,52 +8,39 @@ import { NutrientPulse } from '../components/NutrientPulse';
 import { QuickLogPrompt } from '../components/QuickLogPrompt';
 import { resolveDashboardState, minutesUntilWindow } from '../utils/dashboardState';
 import { currentMealPeriod } from './VenueMenuScreen';
-import { recommendVenue } from '../utils/recommendVenue';
-import { defaultMealWindows, windowsToBlocks } from '../utils/mealWindows';
+import { recommendVenue, VenueRecommendation } from '../utils/recommendVenue';
 import { api } from '../api/client';
 import { useAuthStore } from '../store/authStore';
+import { useCalendar } from '../hooks/useCalendar';
 import type { AuthState } from '../store/authStore';
-import {
-  EatingWindow,
-  TimelineBlock,
-  TrackedNutrient,
-  MealRecommendation,
-} from '../types';
+import type { TrackedNutrient, MealRecommendation } from '../types';
 
-const UW_VENUES: Record<string, { menuUrl: string; mapsQuery: string; dubGrubScheme?: string }> = {
-  'Center Table':                   { menuUrl: 'https://hfs.uw.edu/eat/locations-and-hours/center-table/', mapsQuery: 'Center+Table+UW+Seattle', dubGrubScheme: 'dubgrub://' },
-  'Local Point':                    { menuUrl: 'https://hfs.uw.edu/eat/locations-and-hours/local-point/', mapsQuery: 'Local+Point+UW+Seattle', dubGrubScheme: 'dubgrub://' },
-  'Husky Den Food Court':           { menuUrl: 'https://hfs.uw.edu/eat/locations-and-hours/husky-den/', mapsQuery: 'Husky+Den+Food+Court+UW+Seattle', dubGrubScheme: 'dubgrub://' },
-  'Cultivate':                      { menuUrl: 'https://hfs.uw.edu/eat/locations-and-hours/cultivate/', mapsQuery: 'Cultivate+UW+Seattle' },
-  'By George':                      { menuUrl: 'https://hfs.uw.edu/eat/locations-and-hours/by-george/', mapsQuery: 'By+George+UW+Seattle' },
-  'Dawg Bites':                     { menuUrl: 'https://hfs.uw.edu/eat/locations-and-hours/dawg-bites/', mapsQuery: 'Dawg+Bites+IMA+UW+Seattle' },
-  'Husky Den Café':                 { menuUrl: 'https://hfs.uw.edu/eat/locations-and-hours/husky-den-cafe/', mapsQuery: 'Husky+Den+Cafe+HUB+UW+Seattle' },
-  'Husky Grind Café — Alder':       { menuUrl: 'https://hfs.uw.edu/eat/locations-and-hours/husky-grind-alder/', mapsQuery: 'Husky+Grind+Alder+UW+Seattle' },
-  'Husky Grind Café — Oak':         { menuUrl: 'https://hfs.uw.edu/eat/locations-and-hours/husky-grind-oak/', mapsQuery: 'Husky+Grind+Oak+UW+Seattle' },
-  'Husky Grind Café — Mercer Court':{ menuUrl: 'https://hfs.uw.edu/eat/locations-and-hours/husky-grind-mercer/', mapsQuery: 'Husky+Grind+Mercer+Court+UW+Seattle' },
-  'Microsoft Café':                 { menuUrl: 'https://hfs.uw.edu/eat/locations-and-hours/microsoft-cafe/', mapsQuery: 'Microsoft+Cafe+Gates+Center+UW+Seattle' },
-  "Orin's Place":                   { menuUrl: 'https://hfs.uw.edu/eat/locations-and-hours/orins-place/', mapsQuery: "Orin's+Place+Paccar+Hall+UW+Seattle" },
-  'Public Grounds':                 { menuUrl: 'https://hfs.uw.edu/eat/locations-and-hours/public-grounds/', mapsQuery: 'Public+Grounds+Parrington+Hall+UW+Seattle' },
-  'The Rotunda':                    { menuUrl: 'https://hfs.uw.edu/eat/locations-and-hours/the-rotunda/', mapsQuery: 'Rotunda+Health+Sciences+UW+Seattle' },
-  'Tower Café':                     { menuUrl: 'https://hfs.uw.edu/eat/locations-and-hours/tower-cafe/', mapsQuery: 'Tower+Cafe+UW+Tower+Seattle' },
-  'Starbucks — Population Health':  { menuUrl: 'https://hfs.uw.edu/eat/locations-and-hours/starbucks-population-health/', mapsQuery: 'Starbucks+Hans+Rosling+Center+UW+Seattle' },
-  'Starbucks — Suzzallo':           { menuUrl: 'https://hfs.uw.edu/eat/locations-and-hours/starbucks-suzzallo/', mapsQuery: 'Starbucks+Suzzallo+Library+UW+Seattle' },
-  'District Market — Alder':        { menuUrl: 'https://hfs.uw.edu/eat/locations-and-hours/district-market-alder/', mapsQuery: 'District+Market+Alder+Hall+UW+Seattle' },
-  'District Market — Oak':          { menuUrl: 'https://hfs.uw.edu/eat/locations-and-hours/district-market-oak/', mapsQuery: 'District+Market+Oak+Hall+UW+Seattle' },
-  'Etc. — The HUB':                 { menuUrl: 'https://hfs.uw.edu/eat/locations-and-hours/etc-hub/', mapsQuery: 'Etc+Market+HUB+UW+Seattle' },
+// ---------------------------------------------------------------------------
+// Constants
+// ---------------------------------------------------------------------------
+
+const UW_VENUES: Record<string, { mapsQuery: string }> = {
+  'Center Table':                    { mapsQuery: 'Center+Table+UW+Seattle' },
+  'Local Point':                     { mapsQuery: 'Local+Point+UW+Seattle' },
+  'Husky Den Food Court':            { mapsQuery: 'Husky+Den+Food+Court+UW+Seattle' },
+  'Cultivate':                       { mapsQuery: 'Cultivate+UW+Seattle' },
+  'By George':                       { mapsQuery: 'By+George+UW+Seattle' },
+  'Dawg Bites':                      { mapsQuery: 'Dawg+Bites+IMA+UW+Seattle' },
+  'Husky Den Café':                  { mapsQuery: 'Husky+Den+Cafe+HUB+UW+Seattle' },
+  'Husky Grind Café — Alder':        { mapsQuery: 'Husky+Grind+Alder+UW+Seattle' },
+  'Husky Grind Café — Oak':          { mapsQuery: 'Husky+Grind+Oak+UW+Seattle' },
+  'Husky Grind Café — Mercer Court': { mapsQuery: 'Husky+Grind+Mercer+Court+UW+Seattle' },
+  'Microsoft Café':                  { mapsQuery: 'Microsoft+Cafe+Gates+Center+UW+Seattle' },
+  "Orin's Place":                    { mapsQuery: "Orin's+Place+Paccar+Hall+UW+Seattle" },
+  'Public Grounds':                  { mapsQuery: 'Public+Grounds+Parrington+Hall+UW+Seattle' },
+  'The Rotunda':                     { mapsQuery: 'Rotunda+Health+Sciences+UW+Seattle' },
+  'Tower Café':                      { mapsQuery: 'Tower+Cafe+UW+Tower+Seattle' },
+  'Starbucks — Population Health':   { mapsQuery: 'Starbucks+Hans+Rosling+Center+UW+Seattle' },
+  'Starbucks — Suzzallo':            { mapsQuery: 'Starbucks+Suzzallo+Library+UW+Seattle' },
+  'District Market — Alder':         { mapsQuery: 'District+Market+Alder+Hall+UW+Seattle' },
+  'District Market — Oak':           { mapsQuery: 'District+Market+Oak+Hall+UW+Seattle' },
+  'Etc. — The HUB':                  { mapsQuery: 'Etc+Market+HUB+UW+Seattle' },
 };
-
-const MOCK_WINDOWS: EatingWindow[] = defaultMealWindows();
-
-const MOCK_BLOCKS: TimelineBlock[] = [
-  {
-    startTime: new Date(Date.now() - 60 * 60000).toISOString(),
-    endTime: new Date(Date.now() - 10 * 60000).toISOString(),
-    type: 'class',
-    label: 'CHEM 142',
-  },
-  ...windowsToBlocks(MOCK_WINDOWS),
-];
 
 const NUTRIENT_GOALS: Record<string, { goalAmount: number; unit: string }> = {
   iron:        { goalAmount: 18,   unit: 'mg'  },
@@ -65,102 +52,147 @@ const NUTRIENT_GOALS: Record<string, { goalAmount: number; unit: string }> = {
 };
 
 const DEFAULT_RECOMMENDATION: MealRecommendation = {
-  mealName: 'Drip Coffee + Croissant',
+  mealName: '',
   nutrientMatchScores: {},
-  overallScore: 0.78,
+  overallScore: 0,
   venueName: 'Husky Grind Café — Mercer Court',
   walkMinutes: 5,
+  actionTimeMinutes: 15,
 };
 
+// ---------------------------------------------------------------------------
+// Component
+// ---------------------------------------------------------------------------
+
 export default function DashboardScreen() {
-  const router = useRouter();
-  const params = useLocalSearchParams<{ calendar?: string }>();
+  const router  = useRouter();
+  const params  = useLocalSearchParams<{ calendar?: string; refetch?: string }>();
   const username = useAuthStore((s: AuthState) => s.username);
-  const token = useAuthStore((s: AuthState) => s.token);
-  const isAdmin = username === 'admin';
+  const token    = useAuthStore((s: AuthState) => s.token);
+  const isAdmin  = username === 'admin';
+
   const [now, setNow] = useState(new Date());
   const [recommendation, setRecommendation] = useState<MealRecommendation>(DEFAULT_RECOMMENDATION);
+  const [detourInfo, setDetourInfo] = useState<VenueRecommendation['detourLabel']>('on-your-way');
   const [trackedNutrients, setTrackedNutrients] = useState<TrackedNutrient[]>([
-    { nutrientName: 'Iron', currentAmount: 0, goalAmount: 18, unit: 'mg' },
-    { nutrientName: 'Protein', currentAmount: 0, goalAmount: 60, unit: 'g' },
+    { nutrientName: 'Iron',    currentAmount: 0, goalAmount: 18, unit: 'mg' },
+    { nutrientName: 'Protein', currentAmount: 0, goalAmount: 60, unit: 'g'  },
   ]);
   const [quickLog, setQuickLog] = useState({ show: false, mealName: '' });
-  const [calendarConnected, setCalendarConnected] = useState(false);
 
-  // Detect return from Google OAuth callback
+  // Calendar — single source of truth
+  const calendar = useCalendar();
+
+  // When returning from OAuth, trigger a refresh
   useEffect(() => {
     if (params.calendar === 'connected') {
-      setCalendarConnected(true);
+      calendar.refresh();
     }
-  }, [params.calendar]);
+  }, [params.calendar]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Tick every 30 seconds
+  // Clock tick every 30s
   useEffect(() => {
-    const interval = setInterval(() => setNow(new Date()), 30000);
-    return () => clearInterval(interval);
+    const id = setInterval(() => setNow(new Date()), 30000);
+    return () => clearInterval(id);
   }, []);
 
-  // Load profile + recommendation — re-runs every time screen comes into focus
-  // so nutrient changes in Profile are reflected immediately on return
+  // Load profile + nutrients + venue recommendation
   const loadProfile = useCallback(() => {
-    const nextWindow = MOCK_WINDOWS.find((w) => new Date(w.end) > new Date());
+    const nextWindow = calendar.eatingWindows.find(w => new Date(w.end) > new Date());
     const gapMinutes = nextWindow?.duration_minutes ?? 60;
 
-    // Fetch profile and today's nutrient totals in parallel
     Promise.all([
       api.get('/profile/preferences').catch(() => ({ data: {} })),
       api.get('/meals/today').catch(() => ({ data: { nutrients: {} } })),
-    ]).then(([{ data: prefs }, { data: todayData }]) => {
+    ]).then(async ([{ data: prefs }, { data: todayData }]) => {
+      // Nutrients
       const focus: string[] = prefs.nutrient_focus ?? [];
-      const todayTotals: Record<string, number> = todayData.nutrients ?? {};
-
-      // Build rings with today's actual amounts
+      const totals: Record<string, number> = todayData.nutrients ?? {};
       const keys = focus.length > 0 ? focus : ['iron', 'protein'];
-      const nutrients: TrackedNutrient[] = keys.map((k) => ({
-        nutrientName: k.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
-        // cap at goal so ring shows full, not over
-        currentAmount: Math.min(
-          todayTotals[k] ?? 0,
-          NUTRIENT_GOALS[k]?.goalAmount ?? 100
-        ),
+      setTrackedNutrients(keys.map(k => ({
+        nutrientName: k.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+        currentAmount: totals[k] ?? 0,
         goalAmount: NUTRIENT_GOALS[k]?.goalAmount ?? 100,
         unit: NUTRIENT_GOALS[k]?.unit ?? 'g',
-      }));
-      setTrackedNutrients(nutrients);
+      })));
 
-      return recommendVenue({
+      // Venue recommendation
+      const lastLoggedAt: string | null = todayData.last_logged_at ?? null;
+      const minutesSinceLastMeal = lastLoggedAt
+        ? Math.round((Date.now() - new Date(lastLoggedAt).getTime()) / 60000)
+        : 999;
+
+      const venueResult = await recommendVenue({
         walkingSpeed: prefs.walking_speed ?? 'average',
         studyIntensity: prefs.academic_intensity ?? 'chill',
         gapMinutes,
+        gapCategory: nextWindow?.gap_category,
+        minutesSinceLastMeal,
+        nextEventTitle: calendar.nextEventTitle,
         hardFilters: prefs.hard_filters ?? [],
         prefFilters: prefs.preference_filters ?? [],
       });
-    }).then((result) => {
-      if (result) {
-        setRecommendation({ ...DEFAULT_RECOMMENDATION, venueName: result.venueName, walkMinutes: result.walkMinutes });
+
+      setDetourInfo(venueResult.detourLabel);
+
+      // Fetch nutrient-aware meal recommendation for this venue
+      let mealName = 'Something good';
+      let matchScores: Record<string, number> = {};
+      let overallScore = 0;
+      try {
+        const { data: rec } = await api.get('/meals/recommendation', {
+          params: { venue: venueResult.venueName },
+        });
+        mealName = rec.meal_name ?? mealName;
+        matchScores = rec.nutrient_match_scores ?? {};
+        overallScore = rec.overall_score ?? 0;
+      } catch {
+        // No menu data yet — show venue without a specific meal
       }
+
+      setRecommendation({
+        mealName,
+        venueName: venueResult.venueName,
+        walkMinutes: venueResult.walkMinutes,
+        actionTimeMinutes: venueResult.actionTimeMinutes,
+        nutrientMatchScores: matchScores,
+        overallScore,
+      });
     }).catch(() => {
-      recommendVenue({ walkingSpeed: 'average', studyIntensity: 'chill', gapMinutes })
-        .then((r) => setRecommendation({ ...DEFAULT_RECOMMENDATION, venueName: r.venueName, walkMinutes: r.walkMinutes }))
-        .catch(() => {});
+      recommendVenue({ walkingSpeed: 'average', studyIntensity: 'chill', gapMinutes: 60 })
+        .then(r => {
+          setRecommendation({ ...DEFAULT_RECOMMENDATION, venueName: r.venueName, walkMinutes: r.walkMinutes, actionTimeMinutes: r.actionTimeMinutes });
+          setDetourInfo(r.detourLabel);
+        }).catch(() => {});
     });
-  }, []);
+  }, [calendar.eatingWindows, calendar.nextEventTitle]);
 
   useFocusEffect(loadProfile);
 
-  const dashboardState = resolveDashboardState(now, MOCK_BLOCKS, MOCK_WINDOWS);
-  const nextWindow = MOCK_WINDOWS.find((w) => new Date(w.end) > now);
-  const minsUntil = nextWindow ? minutesUntilWindow(now, nextWindow) : 0;
+  // Force nutrient refetch when returning from log screen
+  useEffect(() => {
+    if (params.refetch === '1') loadProfile();
+  }, [params.refetch]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Derived
+  const classBlocks = calendar.timelineBlocks.filter(b => b.type === 'class');
+  const dashboardState = resolveDashboardState(now, classBlocks, calendar.eatingWindows);
+  const nextWindow = calendar.eatingWindows.find(w => new Date(w.end) > now);
+  const minsUntil  = nextWindow ? minutesUntilWindow(now, nextWindow) : 0;
+
+  // Find the label for the next meal window from the timeline blocks
+  const nextMealBlock = calendar.timelineBlocks.find(
+    b => b.type === 'meal_gap' && nextWindow && b.startTime === nextWindow.start
+  );
+  const nextMealLabel = nextMealBlock?.label ?? 'Meal';
+  const nextMealTime  = nextWindow?.start;
 
   const handleGetDirections = () => {
-    const venue = UW_VENUES[recommendation.venueName];
-    const query = venue?.mapsQuery ?? encodeURIComponent(recommendation.venueName + ' UW Seattle');
+    const query = UW_VENUES[recommendation.venueName]?.mapsQuery ?? encodeURIComponent(recommendation.venueName + ' UW Seattle');
     const googleUrl = `https://www.google.com/maps/search/?api=1&query=${query}`;
-    const appleUrl = `maps://?q=${query}`;
+    const appleUrl  = `maps://?q=${query}`;
     if (Platform.OS === 'ios') {
-      Linking.canOpenURL(appleUrl)
-        .then((ok) => Linking.openURL(ok ? appleUrl : googleUrl))
-        .catch(() => Linking.openURL(googleUrl));
+      Linking.canOpenURL(appleUrl).then(ok => Linking.openURL(ok ? appleUrl : googleUrl)).catch(() => Linking.openURL(googleUrl));
     } else {
       Linking.openURL(googleUrl);
     }
@@ -173,8 +205,8 @@ export default function DashboardScreen() {
 
   const handleCalendarConnect = () => {
     if (!token) return;
-    const backendUrl = (api.defaults.baseURL ?? 'http://localhost:8000').replace(/\/$/, '');
-    Linking.openURL(`${backendUrl}/calendar/connect-init?token=${encodeURIComponent(token)}`);
+    const backendUrl = (api.defaults.baseURL ?? 'http://localhost:8000');
+    calendar.connect(token, backendUrl);
   };
 
   return (
@@ -185,12 +217,11 @@ export default function DashboardScreen() {
         </TouchableOpacity>
         <Text style={styles.appTitle}>Campus Eats</Text>
         <TouchableOpacity onPress={() => router.push(isAdmin ? '/admin/menu' : '/log')} accessibilityRole="button">
-          <Text style={styles.addBtn}>{isAdmin ? '+ Menu' : '[+]'}</Text>
+          <Text style={styles.addBtn}>{isAdmin ? '+ Menu' : 'Log Meal'}</Text>
         </TouchableOpacity>
       </View>
 
       <ScrollView>
-        {/* Hero Card — venue recommendation */}
         <HeroCard
           minutesUntilWindow={minsUntil}
           windowType={nextWindow?.window_type ?? 'golden'}
@@ -198,33 +229,36 @@ export default function DashboardScreen() {
           dashboardState={dashboardState}
           onGetDirections={handleGetDirections}
           onSeeMenu={handleSeeMenu}
+          detourLabel={detourInfo}
+          nextMealLabel={nextMealLabel}
+          nextMealTime={nextMealTime}
         />
 
-        {/* Today timeline */}
+        {/* Today */}
         <View style={styles.sectionRow}>
           <Text style={styles.sectionTitle}>Today</Text>
         </View>
-        <DayTimeline blocks={MOCK_BLOCKS} onGapPress={() => {}} />
 
-        {/* Calendar hero card */}
-        <TouchableOpacity
-          style={styles.calendarCard}
-          onPress={handleCalendarConnect}
-          accessibilityRole="button"
-          accessibilityLabel="Connect Google Calendar"
-        >
-          <View style={styles.calendarIconWrap}>
-            <Text style={styles.calendarPlus}>+</Text>
-          </View>
-          <View style={styles.calendarText}>
-            <Text style={styles.calendarTitle}>
-              {calendarConnected ? 'Calendar Connected' : 'Connect Google Calendar'}
-            </Text>
-            <Text style={styles.calendarSub}>
-              {calendarConnected ? 'Tap to re-sync your schedule' : 'Auto-detect meal gaps between classes'}
-            </Text>
-          </View>
-        </TouchableOpacity>
+        {calendar.status === 'loading' ? (
+          <ActivityIndicator color="#9381ff" style={{ marginTop: 24 }} />
+        ) : calendar.status === 'connected' ? (
+          <DayTimeline blocks={calendar.timelineBlocks} onGapPress={() => {}} />
+        ) : (
+          <TouchableOpacity
+            style={styles.calendarCard}
+            onPress={handleCalendarConnect}
+            accessibilityRole="button"
+            accessibilityLabel="Connect Google Calendar"
+          >
+            <View style={styles.calendarIconWrap}>
+              <Text style={styles.calendarPlus}>+</Text>
+            </View>
+            <View style={styles.calendarText}>
+              <Text style={styles.calendarTitle}>Connect Google Calendar</Text>
+              <Text style={styles.calendarSub}>Auto-detect meal gaps between classes</Text>
+            </View>
+          </TouchableOpacity>
+        )}
 
         {/* Nutrient Pulse */}
         <Text style={[styles.sectionTitle, { marginLeft: 16, marginTop: 20 }]}>Nutrient Pulse</Text>
@@ -234,39 +268,30 @@ export default function DashboardScreen() {
       <QuickLogPrompt
         show={quickLog.show}
         mealName={quickLog.mealName}
-        onYes={() => console.log('Auto-logging meal')}
+        onYes={() => console.log('logged')}
         onNo={() => setQuickLog({ show: false, mealName: '' })}
-        onUndo={() => console.log('Undoing auto-log')}
+        onUndo={() => console.log('undo')}
       />
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0f0f1a' },
-  topBar: {
-    flexDirection: 'row', justifyContent: 'space-between',
-    alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12,
-  },
-  appTitle: { color: '#fff', fontSize: 18, fontWeight: '700' },
-  profileBtn: { color: '#a0c4ff', fontSize: 14 },
-  addBtn: { color: '#a0c4ff', fontSize: 18, fontWeight: '700' },
-  sectionRow: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    marginLeft: 16, marginRight: 16, marginTop: 20,
-  },
-  sectionTitle: { color: '#666', fontSize: 12, textTransform: 'uppercase' },
+  container:  { flex: 1, backgroundColor: '#1a1a24' },
+  topBar:     { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12 },
+  appTitle:   { color: '#e2e2e9', fontSize: 18, fontWeight: '700' },
+  profileBtn: { color: '#a0afc0', fontSize: 14, fontWeight: '600' },
+  addBtn:     { color: '#4361ee', fontSize: 14, fontWeight: '600' },
+  sectionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginLeft: 16, marginRight: 16, marginTop: 20 },
+  sectionTitle: { color: '#a0afc0', fontSize: 12, textTransform: 'uppercase', letterSpacing: 1 },
   calendarCard: {
     flexDirection: 'row', alignItems: 'center', gap: 16,
     backgroundColor: '#1a0808', borderWidth: 1, borderColor: '#c0392b',
     borderRadius: 16, padding: 20, marginHorizontal: 16, marginTop: 12,
   },
-  calendarIconWrap: {
-    width: 48, height: 48, borderRadius: 24,
-    backgroundColor: '#c0392b', alignItems: 'center', justifyContent: 'center',
-  },
-  calendarPlus: { color: '#fff', fontSize: 28, fontWeight: '300', lineHeight: 32 },
-  calendarText: { flex: 1 },
+  calendarIconWrap: { width: 48, height: 48, borderRadius: 24, backgroundColor: '#c0392b', alignItems: 'center', justifyContent: 'center' },
+  calendarPlus:  { color: '#fff', fontSize: 28, fontWeight: '300', lineHeight: 32 },
+  calendarText:  { flex: 1 },
   calendarTitle: { color: '#e74c3c', fontSize: 16, fontWeight: '600', marginBottom: 3 },
-  calendarSub: { color: '#7a3030', fontSize: 13 },
+  calendarSub:   { color: '#7a3030', fontSize: 13 },
 });

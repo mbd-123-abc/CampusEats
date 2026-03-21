@@ -12,7 +12,6 @@ export function resolveDashboardState(
   classBlocks: TimelineBlock[],
   eatingWindows: EatingWindow[],
 ): DashboardState {
-  // startTime/endTime are ISO 8601 timestamps — parse directly
   const activeClass = classBlocks.find(
     (b) =>
       b.type === 'class' &&
@@ -20,6 +19,9 @@ export function resolveDashboardState(
       new Date(b.endTime) > now,
   );
   if (activeClass) return 'in_class';
+
+  // No windows means calendar not connected — treat as normal so HeroCard shows
+  if (eatingWindows.length === 0) return 'normal';
 
   const futureWindows = eatingWindows.filter((w) => new Date(w.end) > now);
   if (futureWindows.length === 0) return 'end_of_day';

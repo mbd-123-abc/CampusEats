@@ -9,10 +9,10 @@ const RADIUS = (RING_SIZE - STROKE_WIDTH) / 2;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 function NutrientRing({ nutrient }: { nutrient: TrackedNutrient }) {
-  const progress = nutrient.goalAmount > 0
+  const progress = (nutrient.goalAmount > 0 && nutrient.currentAmount > 0)
     ? Math.min(nutrient.currentAmount / nutrient.goalAmount, 1)
     : 0;
-  const strokeDashoffset = CIRCUMFERENCE * (1 - progress);
+  const strokeDashoffset = progress === 0 ? CIRCUMFERENCE : CIRCUMFERENCE * (1 - progress);
 
   return (
     <View style={styles.ringContainer}>
@@ -21,7 +21,7 @@ function NutrientRing({ nutrient }: { nutrient: TrackedNutrient }) {
           cx={RING_SIZE / 2}
           cy={RING_SIZE / 2}
           r={RADIUS}
-          stroke="#2d2d2d"
+          stroke="#2d2d3f"
           strokeWidth={STROKE_WIDTH}
           fill="none"
         />
@@ -29,7 +29,7 @@ function NutrientRing({ nutrient }: { nutrient: TrackedNutrient }) {
           cx={RING_SIZE / 2}
           cy={RING_SIZE / 2}
           r={RADIUS}
-          stroke="#4361ee"
+          stroke="#9381ff"
           strokeWidth={STROKE_WIDTH}
           fill="none"
           strokeDasharray={`${CIRCUMFERENCE} ${CIRCUMFERENCE}`}
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
     width: RING_SIZE,
   },
   ringValue: { color: '#fff', fontSize: 12, fontWeight: '600' },
-  nutrientName: { color: '#a0c4ff', fontSize: 12, marginTop: 6, textAlign: 'center' },
-  goal: { color: '#666', fontSize: 10 },
-  hint: { color: '#74c69d', fontSize: 10, textAlign: 'center', marginTop: 4, maxWidth: 100 },
+  nutrientName: { color: '#b8b8d1', fontSize: 12, marginTop: 6, textAlign: 'center' },
+  goal: { color: '#a0afc0', fontSize: 10 },
+  hint: { color: '#9381ff', fontSize: 10, textAlign: 'center', marginTop: 4, maxWidth: 100 },
 });

@@ -56,18 +56,18 @@ STARBUCKS_LOCATIONS = [
 ]
 
 STARBUCKS_BREAKFAST = [
-    {"name": "Egg, Pesto & Mozzarella Sandwich",            "diet_tags": ["vegetarian"]},
+    {"name": "Egg, Pesto & Mozzarella Sandwich",            "diet_tags": ["eggetarian"]},
     {"name": "Bacon, Gouda & Egg Sandwich",                 "diet_tags": []},
     {"name": "Double-Smoked Bacon, Cheddar & Egg Sandwich", "diet_tags": []},
     {"name": "Sausage, Cheddar & Egg Sandwich",             "diet_tags": []},
     {"name": "Turkey Bacon, Cheddar & Egg White Sandwich",  "diet_tags": []},
     {"name": "Impossible™ Breakfast Sandwich",              "diet_tags": ["vegetarian"]},
     {"name": "Bacon, Sausage & Egg Wrap",                   "diet_tags": []},
-    {"name": "Spinach, Feta & Egg White Wrap",              "diet_tags": ["vegetarian"]},
-    {"name": "Truffle, Mushroom & Brie Egg Bites",          "diet_tags": ["vegetarian", "gluten-free"]},
+    {"name": "Spinach, Feta & Egg White Wrap",              "diet_tags": ["eggetarian"]},
+    {"name": "Truffle, Mushroom & Brie Egg Bites",          "diet_tags": ["eggetarian", "gluten-free"]},
     {"name": "Italian Sausage Egg Bites",                   "diet_tags": ["gluten-free"]},
     {"name": "Bacon & Gruyère Egg Bites",                   "diet_tags": ["gluten-free"]},
-    {"name": "Egg White & Roasted Red Pepper Egg Bites",    "diet_tags": ["vegetarian", "gluten-free"]},
+    {"name": "Egg White & Roasted Red Pepper Egg Bites",    "diet_tags": ["eggetarian", "gluten-free"]},
     {"name": "Potato, Cheddar & Chive Bakes",               "diet_tags": ["vegetarian"]},
 ]
 
@@ -99,7 +99,7 @@ STARBUCKS_ALL_DAY = [
     {"name": "Ham & Swiss on Baguette",             "diet_tags": []},
     {"name": "Tomato & Mozzarella on Focaccia",     "diet_tags": ["vegetarian"]},
     # Protein boxes
-    {"name": "Protein Box (egg & cheese)",          "diet_tags": ["vegetarian", "gluten-free"]},
+    {"name": "Protein Box (egg & cheese)",          "diet_tags": ["eggetarian", "gluten-free"]},
     {"name": "Protein Box (peanut butter & banana)","diet_tags": ["vegan"]},
     # Sweets
     {"name": "Birthday Cake Pop",                   "diet_tags": ["vegetarian"]},
@@ -128,6 +128,11 @@ HUSKY_GRIND_ALL_DAY = [
     {"name": "Muffin",          "diet_tags": ["vegetarian"]},
     {"name": "Scone",           "diet_tags": ["vegetarian"]},
     {"name": "Salad",           "diet_tags": ["vegetarian"]},
+    {"name": "Chocolate Bar Donut",   "diet_tags": ["vegetarian"]},
+    {"name": "Maple Bar Donut",       "diet_tags": ["vegetarian"]},
+    {"name": "Fresh Fruit Cup", "diet_tags": ["vegan", "gluten-free", "dairy-free"]},
+    {"name": "Banana",          "diet_tags": ["vegan", "gluten-free", "dairy-free"]},
+    {"name": "Greek Yogurt",    "diet_tags": ["vegetarian", "gluten-free"]},
 ]
 
 HUSKY_GRIND_MEALS = [
@@ -137,19 +142,45 @@ HUSKY_GRIND_MEALS = [
     {"name": "Porridge",            "meal_period": "breakfast", "diet_tags": ["vegan", "gluten-free", "dairy-free"]},
 ]
 
+# Common grab-and-go snacks found at most campus cafés
+COMMON_SNACKS = [
+    {"name": "Chocolate Bar Donut",       "diet_tags": ["vegetarian"]},
+    {"name": "Maple Bar Donut",           "diet_tags": ["vegetarian"]},
+    {"name": "Fresh Fruit Cup",     "diet_tags": ["vegan", "gluten-free", "dairy-free"]},
+    {"name": "Banana",              "diet_tags": ["vegan", "gluten-free", "dairy-free"]},
+    {"name": "Greek Yogurt",        "diet_tags": ["vegetarian", "gluten-free"]},
+]
+
 # ---------------------------------------------------------------------------
 # By George (Odegaard)
 # ---------------------------------------------------------------------------
 
 BY_GEORGE_ALL_DAY = [
     # Coffee — expanded in seed loop via COFFEE_DRINKS
+    # Starbucks-style items (By George carries the same lineup)
+    {"name": "Egg, Pesto & Mozzarella Sandwich",            "diet_tags": ["eggetarian"]},
+    {"name": "Bacon, Gouda & Egg Sandwich",                 "diet_tags": []},
+    {"name": "Spinach, Feta & Egg White Wrap",              "diet_tags": ["eggetarian"]},
+    {"name": "Butter Croissant",                            "diet_tags": ["vegetarian"]},
+    {"name": "Chocolate Croissant",                         "diet_tags": ["vegetarian"]},
+    {"name": "Blueberry Streusel Muffin",                   "diet_tags": ["vegetarian"]},
+    {"name": "Iced Lemon Loaf",                             "diet_tags": ["vegetarian"]},
+    {"name": "Plain Bagel",                                 "diet_tags": ["vegan", "dairy-free"]},
+    {"name": "Everything Bagel",                            "diet_tags": ["vegan", "dairy-free"]},
+    {"name": "Avocado Spread",                              "diet_tags": ["vegan", "gluten-free", "dairy-free"]},
+    {"name": "Protein Box (egg & cheese)",                  "diet_tags": ["eggetarian", "gluten-free"]},
+    # By George exclusives
     {"name": "Smoothie",            "diet_tags": ["vegan", "gluten-free", "dairy-free"]},
     {"name": "Açai Bowl",           "diet_tags": ["vegan", "gluten-free", "dairy-free"]},
-    {"name": "Croissant",           "diet_tags": ["vegetarian"]},
-    {"name": "Muffin",              "diet_tags": ["vegetarian"]},
     {"name": "Donut",               "diet_tags": ["vegetarian"]},
     {"name": "Grab-and-go Salad",   "diet_tags": ["vegetarian"]},
     {"name": "Sushi Rolls",         "diet_tags": ["pescatarian"]},
+    # Common snacks
+    {"name": "Chocolate Bar Donut",       "diet_tags": ["vegetarian"]},
+    {"name": "Maple Bar Donut",           "diet_tags": ["vegetarian"]},
+    {"name": "Fresh Fruit Cup",     "diet_tags": ["vegan", "gluten-free", "dairy-free"]},
+    {"name": "Banana",              "diet_tags": ["vegan", "gluten-free", "dairy-free"]},
+    {"name": "Greek Yogurt",        "diet_tags": ["vegetarian", "gluten-free"]},
 ]
 
 BY_GEORGE_MEALS = [
@@ -188,14 +219,74 @@ DISTRICT_MARKET_ALL_DAY = [
     {"name": "Sushi Rolls",         "diet_tags": ["pescatarian"]},
     {"name": "Fresh Fruit Cup",     "diet_tags": ["vegan", "gluten-free", "dairy-free"]},
     {"name": "Greek Yogurt Parfait","diet_tags": ["vegetarian", "gluten-free"]},
+    {"name": "Greek Yogurt",        "diet_tags": ["vegetarian", "gluten-free"]},
     {"name": "Hard Boiled Eggs",    "diet_tags": ["vegetarian", "gluten-free", "dairy-free"]},
     {"name": "Grab-and-go Sandwich","diet_tags": []},
     {"name": "Chips & Snacks",      "diet_tags": ["vegan"]},
+    {"name": "Chocolate Bar Donut",       "diet_tags": ["vegetarian"]},
+    {"name": "Maple Bar Donut",           "diet_tags": ["vegetarian"]},
+    {"name": "Banana",              "diet_tags": ["vegan", "gluten-free", "dairy-free"]},
 ]
 
 DISTRICT_MARKET_MEALS = [
     {"name": "Deli Hot Food",   "meal_period": "lunch",  "diet_tags": []},
     {"name": "Deli Salad",      "meal_period": "lunch",  "diet_tags": ["vegetarian"]},
+]
+
+# ---------------------------------------------------------------------------
+# Center Table (Willow Hall)
+# ---------------------------------------------------------------------------
+
+CENTER_TABLE_BREAKFAST = [
+    # Plant-based
+    {"name": "Plant-Based Scrambled Eggs",      "diet_tags": ["vegan", "gluten-free", "dairy-free"]},
+    {"name": "Plant-Based Sausage Patty",       "diet_tags": ["vegan", "gluten-free", "dairy-free"]},
+    {"name": "Plant Powered Sausage & Egg",     "diet_tags": ["eggetarian", "gluten-free"]},
+    {"name": "Plant-Powered Egg & Cheese",      "diet_tags": ["eggetarian"]},
+    # Egg-based
+    {"name": "Cage-Free Scrambled Eggs",        "diet_tags": ["eggetarian", "gluten-free", "dairy-free"]},
+    {"name": "Classic Breakfast Sandwich",      "diet_tags": []},   # egg + meat
+    {"name": "Sausage, Egg & Cheese",           "diet_tags": []},   # egg + meat
+    {"name": "Bacon, Egg & Cheese",             "diet_tags": []},   # egg + meat
+    # Meat sides — chicken sausage has beef casing so not halal/kosher
+    {"name": "Bacon",                           "diet_tags": []},
+    {"name": "Chicken Sausage Link",            "diet_tags": []},  # beef casing
+    {"name": "Hashbrowns",                      "diet_tags": ["vegan", "gluten-free", "dairy-free"]},
+    # Bars & fruit
+    {"name": "Waffle Bar",                      "diet_tags": ["vegetarian"]},
+    {"name": "Cereal Bar",                      "diet_tags": ["vegetarian"]},
+    {"name": "Salad Bar",                       "diet_tags": ["vegan", "gluten-free", "dairy-free"]},
+    {"name": "Whole Fruit",                     "diet_tags": ["vegan", "gluten-free", "dairy-free"]},
+]
+
+DINING_HALL_LUNCH_DINNER = [
+    # Pizza
+    {"name": "Cheese Pizza",                        "diet_tags": ["vegetarian"]},
+    {"name": "Pepperoni Pizza",                     "diet_tags": []},
+    # Burgers
+    {"name": "Classic Dub Burger",                  "diet_tags": []},           # beef, chicken, or veggie patty
+    {"name": "Smokestack Burger",                   "diet_tags": []},           # beef
+    {"name": "Hellfire Burger",                     "diet_tags": []},           # beef
+    {"name": "Lil Dub Burger",                      "diet_tags": []},           # beef
+    # Chicken
+    {"name": "Chicken Sandwich",                    "diet_tags": []},
+    {"name": "Nashville Hot Chicken Sandwich",      "diet_tags": []},
+    {"name": "Dub Me Tenders",                      "diet_tags": []},           # chicken
+    # Fish
+    {"name": "Fish and Chips",                      "diet_tags": []},           # fish
+    # Sides
+    {"name": "Fries",                               "diet_tags": ["vegan", "gluten-free", "dairy-free"]},
+    # Deli sandwiches
+    {"name": "Turkey Cheddar Sandwich",             "diet_tags": []},           # turkey
+    {"name": "BLTC Sandwich",                       "diet_tags": []},           # bacon
+    {"name": "Italian Club Sandwich",               "diet_tags": []},           # salami, ham
+    {"name": "Ham and Havarti Sandwich",            "diet_tags": []},           # ham
+    {"name": "Tofu Goddess Sandwich",               "diet_tags": ["vegan"]},
+    {"name": "Roasted Vegetable Wrap",              "diet_tags": ["vegan"]},
+    {"name": "Caprese Sandwich",                    "diet_tags": ["vegetarian"]},
+    {"name": "Tuna Salad Sandwich",                 "diet_tags": ["pescatarian"]},
+    {"name": "Toasted Cheese",                      "diet_tags": ["vegetarian"]},
+    {"name": "Tomato Soup",                         "diet_tags": ["vegetarian"]},
 ]
 
 # ---------------------------------------------------------------------------
@@ -205,21 +296,41 @@ DISTRICT_MARKET_MEALS = [
 STAPLES = [
     # Husky Den Café
     {"name": "Grab-and-go Snacks",  "venue": "Husky Den Café",      "meal_period": "all day", "diet_tags": []},
+    {"name": "Chocolate Bar Donut",       "venue": "Husky Den Café",      "meal_period": "all day", "diet_tags": ["vegetarian"]},
+    {"name": "Banana",              "venue": "Husky Den Café",      "meal_period": "all day", "diet_tags": ["vegan", "gluten-free", "dairy-free"]},
+    {"name": "Greek Yogurt",        "venue": "Husky Den Café",      "meal_period": "all day", "diet_tags": ["vegetarian", "gluten-free"]},
     # Etc. — The HUB
     {"name": "Grab-and-go Wrap",    "venue": "Etc. — The HUB",      "meal_period": "all day", "diet_tags": []},
     {"name": "Fresh Fruit Cup",     "venue": "Etc. — The HUB",      "meal_period": "all day", "diet_tags": ["vegan", "gluten-free", "dairy-free"]},
     {"name": "Chips & Snacks",      "venue": "Etc. — The HUB",      "meal_period": "all day", "diet_tags": ["vegan"]},
+    {"name": "Chocolate Bar Donut",       "venue": "Etc. — The HUB",      "meal_period": "all day", "diet_tags": ["vegetarian"]},
+    {"name": "Maple Bar Donut",           "venue": "Etc. — The HUB",      "meal_period": "all day", "diet_tags": ["vegetarian"]},
+    {"name": "Banana",              "venue": "Etc. — The HUB",      "meal_period": "all day", "diet_tags": ["vegan", "gluten-free", "dairy-free"]},
+    {"name": "Greek Yogurt",        "venue": "Etc. — The HUB",      "meal_period": "all day", "diet_tags": ["vegetarian", "gluten-free"]},
+    {"name": "Sushi Rolls",         "venue": "Etc. — The HUB",      "meal_period": "all day", "diet_tags": ["pescatarian"]},
     # Dawg Bites (IMA)
     {"name": "Protein Bar",         "venue": "Dawg Bites",          "meal_period": "all day", "diet_tags": []},
     {"name": "Smoothie",            "venue": "Dawg Bites",          "meal_period": "all day", "diet_tags": ["vegan", "gluten-free", "dairy-free"]},
+    {"name": "Banana",              "venue": "Dawg Bites",          "meal_period": "all day", "diet_tags": ["vegan", "gluten-free", "dairy-free"]},
+    {"name": "Greek Yogurt",        "venue": "Dawg Bites",          "meal_period": "all day", "diet_tags": ["vegetarian", "gluten-free"]},
+    {"name": "Fresh Fruit Cup",     "venue": "Dawg Bites",          "meal_period": "all day", "diet_tags": ["vegan", "gluten-free", "dairy-free"]},
     # Orin's Place (Paccar)
     {"name": "Grab-and-go Snacks",  "venue": "Orin's Place",        "meal_period": "all day", "diet_tags": []},
+    {"name": "Chocolate Bar Donut",       "venue": "Orin's Place",        "meal_period": "all day", "diet_tags": ["vegetarian"]},
+    {"name": "Banana",              "venue": "Orin's Place",        "meal_period": "all day", "diet_tags": ["vegan", "gluten-free", "dairy-free"]},
     # Public Grounds (Parrington)
     {"name": "Grab-and-go Snacks",  "venue": "Public Grounds",      "meal_period": "all day", "diet_tags": []},
+    {"name": "Chocolate Bar Donut",       "venue": "Public Grounds",      "meal_period": "all day", "diet_tags": ["vegetarian"]},
+    {"name": "Banana",              "venue": "Public Grounds",      "meal_period": "all day", "diet_tags": ["vegan", "gluten-free", "dairy-free"]},
     # The Rotunda (Health Sciences)
     {"name": "Grab-and-go Snacks",  "venue": "The Rotunda",         "meal_period": "all day", "diet_tags": []},
+    {"name": "Fresh Fruit Cup",     "venue": "The Rotunda",         "meal_period": "all day", "diet_tags": ["vegan", "gluten-free", "dairy-free"]},
+    {"name": "Greek Yogurt",        "venue": "The Rotunda",         "meal_period": "all day", "diet_tags": ["vegetarian", "gluten-free"]},
+    {"name": "Banana",              "venue": "The Rotunda",         "meal_period": "all day", "diet_tags": ["vegan", "gluten-free", "dairy-free"]},
     # Tower Café
     {"name": "Grab-and-go Snacks",  "venue": "Tower Café",          "meal_period": "all day", "diet_tags": []},
+    {"name": "Chocolate Bar Donut",       "venue": "Tower Café",          "meal_period": "all day", "diet_tags": ["vegetarian"]},
+    {"name": "Banana",              "venue": "Tower Café",          "meal_period": "all day", "diet_tags": ["vegan", "gluten-free", "dairy-free"]},
 ]
 
 # All venues that serve coffee — will get all 4 COFFEE_DRINKS seeded
@@ -306,6 +417,25 @@ async def seed():
         for loc in COFFEE_VENUES:
             for item in COFFEE_DRINKS:
                 add(item["name"], loc, "all day", item["diet_tags"])
+
+        # Center Table / Dining Hall North (same location, both names)
+        for item in CENTER_TABLE_BREAKFAST:
+            add(item["name"], "Center Table", "breakfast", item["diet_tags"])
+        for item in DINING_HALL_LUNCH_DINNER:
+            add(item["name"], "Center Table", "lunch", item["diet_tags"])
+            add(item["name"], "Center Table", "dinner", item["diet_tags"])
+
+        # Local Point (West Campus Dining Hall) — rename any existing rows first
+        await session.execute(
+            __import__('sqlalchemy').update(MenuItem)
+            .where(MenuItem.venue == "West Campus Dining Hall")
+            .values(venue="Local Point")
+        )
+        for item in CENTER_TABLE_BREAKFAST:
+            add(item["name"], "Local Point", "breakfast", item["diet_tags"])
+        for item in DINING_HALL_LUNCH_DINNER:
+            add(item["name"], "Local Point", "lunch", item["diet_tags"])
+            add(item["name"], "Local Point", "dinner", item["diet_tags"])
 
         # Other staples
         for item in STAPLES:
