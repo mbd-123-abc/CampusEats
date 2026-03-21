@@ -94,7 +94,7 @@ College students are busy. Between back-to-back lectures, study sessions, and ev
 
 ### Demo
 
-* [Android Deployment]()
+* [Android Deployment](https://expo.dev/accounts/mbd_123_abc/projects/campus-fuel/builds/0fa8f86f-8a5b-4d01-9607-8b698267fca3)
 * [Youtube Demo](https://youtu.be/v-UeyXuKfDI)
 
 ### Feedback Form
@@ -324,7 +324,9 @@ Please open a GitHub issue with:
 
 ### Socials
 
-> To be added.
+* [LinkedIn](www.linkedin.com/in/mahika-bagri)
+* [Email](mahika13.3@gmail.com)
+* [Discord]((https://discord.com/users/697914065418321961))
 
 ### Acknowledgements
 
