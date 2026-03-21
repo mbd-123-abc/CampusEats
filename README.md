@@ -65,7 +65,7 @@ College students are busy. Between back-to-back lectures, study sessions, and ev
 - [x] Rate limiting on all endpoints
 - [x] Admin menu management
 - [ ] Push notifications for meal windows
-- [ ] Dining hall live hours / open status
+- [x] Venue schedule-based open/closed status (real HFS hours)
 - [ ] Meal history and weekly trends
 - [ ] Friends / social logging
 - [ ] EAS production build + App Store submission
@@ -176,6 +176,7 @@ Run migrations and seed:
 alembic upgrade head
 python3 seed_admin.py
 python3 seed_menu.py
+python3 seed_venue_hours.py
 python3 backfill_nutrients.py   # fetches USDA nutrient data — requires internet
 ```
 
@@ -249,6 +250,7 @@ CampusEats/
 │   ├── migrations/         # Alembic migration versions
 │   ├── seed_admin.py
 │   ├── seed_menu.py
+│   ├── seed_venue_hours.py
 │   ├── backfill_nutrients.py
 │   ├── requirements.txt
 │   └── render.yaml
@@ -291,7 +293,7 @@ CampusEats/
 | POST | `/calendar/sync` | JWT | Sync calendar |
 | GET | `/admin/menu/items` | Admin | List menu items |
 | POST | `/admin/menu/items` | Admin | Add menu item |
-| PATCH | `/admin/venues/:venue/status` | Admin | Toggle venue open/closed |
+| PATCH | `/admin/venues/:venue` | Admin | Toggle venue open/closed (override schedule) |
 
 Full interactive docs at `/docs` when running locally.
 

@@ -151,6 +151,11 @@ class VenueStatus(Base):
 
     venue = Column(String(100), primary_key=True)
     is_open = Column(Boolean, nullable=False, default=True)
+    # schedule: {"mon": {"open": "07:30", "close": "20:00"} | null, "tue": ..., ...}
+    # null for a day means closed. Keys: mon tue wed thu fri sat sun
+    schedule = Column(FlexJSON, nullable=True)
+    # override_open: if set, overrides schedule-computed is_open (for holidays/special closures)
+    override_open = Column(Boolean, nullable=True)
     updated_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.now())
 
 
