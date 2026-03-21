@@ -94,7 +94,7 @@ College students are busy. Between back-to-back lectures, study sessions, and ev
 
 ### Demo
 
-* [Android Deployment](https://expo.dev/accounts/mbd_123_abc/projects/campus-fuel/builds/0601fc13-3c15-46b6-a15e-a5ec14aa934a)
+* [Android Deployment]()
 * [Youtube Demo](https://youtu.be/v-UeyXuKfDI)
 
 ### Feedback Form
@@ -333,4 +333,4 @@ Please open a GitHub issue with:
 - [Google Calendar API](https://developers.google.com/calendar) — schedule integration
 - [Expo](https://expo.dev/) — React Native toolchain
 - [Render](https://render.com/) — backend hosting
-- [Kiro] (https://kiro.dev/) - spec driven AI IDE 
+- [Kiro](https://kiro.dev/) - spec driven AI IDE 
