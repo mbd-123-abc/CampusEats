@@ -3,11 +3,11 @@
 **Version:** 1.0 (MVP)
 **Contributors:** Mahika Bagri
 
-`Campus Eats` is a mobile app for UW students to track nutrients, find campus dining venues, and get personalized meal recommendations based on their schedule and dietary goals.
+Born at the University of Washington to solve the 'starving student' trade-off, `Campus Eats` is a mobile app designed to eliminate the decision fatigue of college dining. It is the first intelligent dining companion built to sync with the chaotic rhythm of student life, weaving together student schedules, tracking dietary nutrition goals, and campus geography. Campus Eats connects your Google Calendar to the campus dining map, finding the gaps in your day, recommending the nearest venue, and suggesting the specific meal that best covers your nutrient deficits. 
 
 ### Motivation
 
-College students are busy. Between back-to-back lectures, study sessions, and everything else, eating well is the first thing to slip. Campus Eats connects your Google Calendar to the campus dining map — finding the gaps in your day, recommending the nearest venue, and suggesting the specific meal that best covers your nutrient deficits. It's not a meal planner. It's a real-time co-pilot for eating smarter between classes.
+College students are busy. Between back-to-back lectures, study sessions, and everything else, eating well is the first thing to slip. This often has more drastic impacts than students realize at first. For me, it was a dramatic nosebleed, a bloodtest, and the diagnosis of anemia. Anemia isn't just a medical term; for a student, it’s the exhaustion that feels like a wall, breathlessness during a walk up the stairs in Odegaard Library, and the sudden realization that your body is running on empty. It’s the moment you realize your GPA is thriving, but your health is failing because the friction of finding a balanced meal felt like one task too many. CampusEats was created to eliminate the "where," the "when," and the "what" off your plate. It’s more than an app; it’s the safety net I wish I’d had.
 
 ---
 
