@@ -346,7 +346,7 @@ CampusEats was built entirely using **Kiro**, utilizing a "Spec-Driven" workflow
 * **Vibe Coding vs. Structure:** While I used "Vibe Coding" for rapid UI iteration on the **Muted Amethyst** color palette, I pivoted to strict **Steering Files** to enforce `asyncpg` and Type-Safety across the mobile-to-backend bridge.
 * **Timeline Checkpointing:** During the complex transition from SQLite to PostgreSQL/Supabase, Kiro's **Checkpointing** feature allowed me to safely explore different connection pool configurations without losing progress.
 
-### 🕒 Post-Deadline Activity Disclosure
+### Post-Deadline Activity Disclosure
 * **March 21:** Emergency hotfix for Android-specific OAuth redirect (switched to `openAuthSessionAsync`) to ensure judges could access the live demo. No new features were added.
 * **March 22:** README polish
 * **March 23:** Documentation clarity for contact information, Android deployment link update, and Kiro usage.
