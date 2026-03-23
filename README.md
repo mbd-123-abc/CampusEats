@@ -325,7 +325,7 @@ Please open a GitHub issue with:
 
 * [LinkedIn](www.linkedin.com/in/mahika-bagri)
 * [Email](mahika13.3@gmail.com)
-* [Discord]((https://discord.com/users/697914065418321961))
+* [Discord](https://discord.com/users/697914065418321961)
 
 ### Acknowledgements
 
