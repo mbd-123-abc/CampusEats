@@ -70,6 +70,14 @@ College students are busy. Between back-to-back lectures, study sessions, and ev
 - [ ] Friends / social logging
 - [ ] EAS production build + App Store submission
 
+## Kiro: From Prototype to Production
+
+CampusEats was built entirely using **Kiro**, utilizing a "Spec-Driven" workflow to manage high-complexity integrations like the USDA API and Google OAuth.
+
+* **Spec-Driven Development:** I utilized `.md` specification files to architect the **Chronos** (Gap Detection) and **NutriPath** (Scoring) engines. By defining the logic in markdown first, Kiro generated 90% of the async backend logic with zero architectural drift.
+* **Agent Hooks:** I configured custom `file-save` hooks to run `ruff` linting and `pytest` on the FastAPI backend automatically, ensuring that "fire-and-forget" nutrient fetching never broke the main thread.
+* **Vibe Coding vs. Structure:** While I used "Vibe Coding" for rapid UI iteration on the **Muted Amethyst** color palette, I pivoted to strict **Steering Files** to enforce `asyncpg` and Type-Safety across the mobile-to-backend bridge.
+* **Timeline Checkpointing:** During the complex transition from SQLite to PostgreSQL/Supabase, Kiro's **Checkpointing** feature allowed me to safely explore different connection pool configurations without losing progress.
 ---
 
 ## User Guide
