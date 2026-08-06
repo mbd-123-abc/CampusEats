@@ -122,7 +122,7 @@ College students are busy. Between back-to-back lectures, study sessions, and ev
 
 **Database**
 - SQLite (local development)
-- PostgreSQL 15 (production via Render)
+- PostgreSQL 15 (production via Supabase)
 
 **Authentication**
 - JWT bearer tokens (24h expiry)
