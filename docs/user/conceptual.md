@@ -5,7 +5,7 @@
 
 ---
 
-<summary>Table of Contents</summary>
+## Table of Contents
 <ul>
   <li><a href="#What-is-Campus-Eats">What is Campus Eats</a>
   <li><a href="#Why-use-Campus-Eats"> Why use Campus Eats</a>
