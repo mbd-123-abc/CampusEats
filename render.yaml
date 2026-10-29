@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: campus-eats-api
+    runtime: python
+    region: oregon
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: campus-eats-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: BCRYPT_ROUNDS
+        value: "12"
+      - key: REDIS_URL
+        sync: false
+      # Google Calendar OAuth2 — set these in Render dashboard
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_REDIRECT_URI
+        value: https://campus-eats-api.onrender.com/calendar/callback
+      - key: FRONTEND_URL
+        sync: false   # set to your Expo/app URL in Render dashboard
+
+databases:
+  - name: campus-eats-db
+    databaseName: campus_eats
+    region: oregon
+    plan: starter
+    postgresMajorVersion: 15
