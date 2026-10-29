@@ -49,7 +49,7 @@ Born at the University of Washington, `Campus Eats` is a mobile app designed to 
 - **Preference** - Preferences will always be taken into account. There is no way to turn it off, but you can always change it 
  
 ### Times 
-- **One Time cCnnect** - You only have to connect your Google Calendar once. Keep in mind this means there are no re-connect options if you connect the wrong account. 
+- **One Time Connect** - You only have to connect your Google Calendar once. Keep in mind this means there are no re-connect options if you connect the wrong account. 
 - **Calendar Magic** - The app will automatically find gaps in your day daily (also re-calibrating if your calendar changes between the day)
 - **Buffers** - A 20 minute gap does not mean 20 minutes of walking, neither does it mean 20 minutes of walking. The app will optimize for locations on the way (on the path), and if you need to come back then locations closest to you (eg. a place 5 minutes away)
 
