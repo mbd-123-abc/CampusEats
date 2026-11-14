@@ -18,7 +18,7 @@
 
 ## Creating an Account 
 
-
+<img src="images/CreatingAnAccount1.png" width="250" /> <img src="CreatingAnAccount2.png" width="250" />
 
 ---
 
