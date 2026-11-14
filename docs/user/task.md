@@ -25,7 +25,7 @@
 ## Scheduling your Meals 
 
 #### Connecting to Google Calendar
-
+<img src="images/ScheduleMeals1.png" width="250" /> <img src="images/ScheduleMeals2.png" width="250" /> <img src="images/ScheduleMeals3.png" width="250" /> <img src="images/ScheduleMeals4.png" width="250" /> <img src="images/ScheduleMeals5.png" width="250" />
 ---
 
 ## Viewing and Updating 
