@@ -31,19 +31,19 @@
 ## Viewing and Updating 
 
 #### Preferences
+<img src="images/Preferences1.png" width="250" /> <img src="images/Preferences2.png" width="250" />
 
 #### Nutrient Tracking 
-
-#### Menus
-
-#### Maps
+<img src="images/NutrientTracking1.png" width="150" /> <img src="images/NutrientTracking2.png" width="150" /> <img src="images/NutrientTracking3.png" width="150" /> <img src="images/NutrientTracking4.png" width="150" /> <img src="images/NutrientTracking5.png" width="150" />
 
 ---
 
 ## Settings and Privacy 
 
-#### Location Services   
-
 #### Notifications
+<img src="images/Preferences1.png" width="250" /> <img src="images/Notification.png" width="250" />
+
+#### Logging Out
+<img src="images/Preferences1.png" width="250" /> <img src="images/Logout.png" width="250" />
 
 ---
